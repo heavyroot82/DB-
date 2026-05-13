@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DragonBoat Pro</title>
+    
+    <!-- PWA 및 모바일 최적화 메타 태그 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-beat { animation: pulse 0.1s ease-out; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        input:disabled { opacity: 0.5; cursor: not-allowed; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center font-sans overflow-x-hidden selection:bg-blue-500/30">
+
+    <div class="max-w-md w-full px-4 pt-6 pb-20 space-y-4">
+        <!-- 상단 헤더 -->
+        <header class="flex justify-between items-center px-2">
+            <div>
+                <h1 class="text-2xl font-black text-blue-500 tracking-tighter">DRAGON<span class="text-white">PRO</span></h1>
+                <p id="connection-status" class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Standalone Mode</p>
+            </div>
+            <div id="wake-lock-indicator" class="flex items-center gap-1.5 px-3 py-1 bg-slate-900 rounded-full border border-slate-800">
+                <div class="w-1.5 h-1.5 bg-slate-500 rounded-full" id="lock-dot"></div>
+                <span class="text-[10px] font-bold text-slate-400" id="lock-text">SCREEN ON</span>
+            </div>
+        </header>
+
+        <!-- 방 관리 섹션 -->
+        <div class="glass-panel rounded-3xl p-5 border border-slate-800 shadow-2xl">
+            <div class="flex gap-1 bg-slate-900 p-1 rounded-2xl mb-4">
+                <button id="tab-create" class="flex-1 py-2.5 text-sm font-bold bg-slate-800 rounded-xl text-blue-400 shadow-sm transition-all">Create</button>
+                <button id="tab-join" class="flex-1 py-2.5 text-sm font-bold text-slate-500 transition-all">Join</button>
+            </div>
+
+            <div id="panel-create" class="space-y-3">
+                <button id="btn-create-room" class="w-full bg-blue-600 hover:bg-blue-500 py-3.5 rounded-xl font-black text-sm transition-all active:scale-[0.98] shadow-lg shadow-blue-900/20">새로운 훈련 세션 시작</button>
+            </div>
+
+            <div id="panel-join" class="hidden flex gap-2">
+                <input type="text" id="room-input" placeholder="ROOM ID" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center font-mono font-bold focus:border-blue-500 outline-none">
+                <button id="btn-join-room" class="bg-slate-700 hover:bg-slate-600 px-6 rounded-xl font-bold transition-all active:scale-[0.98]">입장</button>
+            </div>
+
+            <div id="room-active-ui" class="hidden mt-4 pt-4 border-t border-slate-800/50 flex justify-between items-center">
+                <div class="flex flex-col">
+                    <span class="text-[9px] text-slate-500 font-black uppercase">Connected</span>
+                    <span id="display-room-id" class="font-mono text-blue-400 font-black text-lg leading-none">------</span>
+                </div>
+                <button id="btn-leave" class="px-4 py-2 bg-rose-500/10 text-rose-500 rounded-lg text-xs font-black hover:bg-rose-500/20 transition-all">LEAVE</button>
+            </div>
+        </div>
+
+        <!-- 훈련 설정 -->
+        <div id="settings-area" class="glass-panel rounded-3xl p-5 border border-slate-800 space-y-5">
+            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                Training Program
+            </h3>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="col-span-2 text-[10px] font-bold text-blue-500/70">STAGE 1: START</div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] text-slate-600 font-bold ml-1">SPM</label>
+                        <input type="number" id="p1-spm" value="60" class="cfg w-full bg-slate-900 border border-slate-700 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] text-slate-600 font-bold ml-1">STROKES</label>
+                        <input type="number" id="p1-cnt" value="10" class="cfg w-full bg-slate-900 border border-slate-700 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="col-span-2 text-[10px] font-bold text-blue-500/70">STAGE 2: SPURT</div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] text-slate-600 font-bold ml-1">SPM</label>
+                        <input type="number" id="p2-spm" value="90" class="cfg w-full bg-slate-900 border border-slate-700 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] text-slate-600 font-bold ml-1">STROKES</label>
+                        <input type="number" id="p2-cnt" value="20" class="cfg w-full bg-slate-900 border border-slate-700 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <div class="text-[10px] font-bold text-blue-500/70">STAGE 3: CRUISE</div>
+                    <label class="text-[9px] text-slate-600 font-bold ml-1">SPM (UNTIL STOP)</label>
+                    <input type="number" id="p3-spm" value="80" class="cfg w-full bg-slate-900 border border-slate-700 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- 메인 디스플레이 -->
+        <div id="main-display" class="hidden glass-panel rounded-[2.5rem] p-8 border border-blue-500/30 text-center relative overflow-hidden">
+            <div id="prog-bar" class="absolute top-0 left-0 h-1.5 bg-blue-500 transition-all duration-300" style="width: 0%"></div>
+            <div id="phase-tag" class="inline-block px-4 py-1.5 bg-blue-500/10 text-blue-400 text-[10px] font-black rounded-full mb-6 border border-blue-500/20">WAITING</div>
+            
+            <div class="flex flex-col items-center mb-8">
+                <div id="val-spm" class="text-9xl font-black leading-none tracking-tighter text-white">0</div>
+                <div class="text-xs font-black text-slate-500 tracking-[0.5em] mt-4 uppercase">Strokes Per Min</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-slate-950/50 rounded-2xl py-5 border border-slate-800">
+                    <div class="text-[10px] text-slate-600 font-black mb-1 uppercase tracking-widest">Stroke</div>
+                    <div id="val-cnt" class="text-4xl font-mono font-bold text-yellow-500">0</div>
+                </div>
+                <div class="bg-slate-950/50 rounded-2xl py-5 border border-slate-800">
+                    <div class="text-[10px] text-slate-600 font-black mb-1 uppercase tracking-widest">Goal</div>
+                    <div id="val-goal" class="text-4xl font-mono font-bold text-slate-400">0</div>
+                </div>
+            </div>
+
+            <div id="beat-indicator" class="w-14 h-14 bg-white rounded-full mx-auto opacity-5 blur-md transition-all duration-75"></div>
+        </div>
+
+        <!-- 하단 컨트롤 -->
+        <div class="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto flex gap-3">
+            <button id="btn-start" class="flex-1 bg-white text-slate-950 py-5 rounded-2xl text-xl font-black shadow-2xl active:scale-95 transition-all">START</button>
+            <button id="btn-stop" class="hidden flex-1 bg-rose-600 text-white py-5 rounded-2xl text-xl font-black active:scale-95 transition-all">STOP</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Setup
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dragon-pro-v1';
+
+        let user = null;
+        let currentRoomId = null;
+        let isLeader = false;
+        let wakeLock = null;
+
+        // Audio Engine Vars
+        let audioCtx = null;
+        let timerID = null;
+        let nextTime = 0;
+        let phaseIdx = 0;
+        let strokeIdx = 0;
+        let activeProg = [];
+
+        // UI Selectors
+        const el = id => document.getElementById(id);
+        const ui = {
+            tabs: [el('tab-create'), el('tab-join')],
+            panels: [el('panel-create'), el('panel-join')],
+            start: el('btn-start'),
+            stop: el('btn-stop'),
+            display: el('main-display'),
+            settings: el('settings-area')
+        };
+
+        // --- Wake Lock (화면 꺼짐 방지) ---
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    el('lock-dot').classList.replace('bg-slate-500', 'bg-emerald-500');
+                    el('lock-text').classList.replace('text-slate-400', 'text-emerald-400');
+                } catch (err) { console.error(err); }
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock) {
+                wakeLock.release();
+                wakeLock = null;
+                el('lock-dot').classList.replace('bg-emerald-500', 'bg-slate-500');
+                el('lock-text').classList.replace('text-emerald-400', 'text-slate-400');
+            }
+        }
+
+        // --- Auth & Rooms ---
+        signInAnonymously(auth);
+        onAuthStateChanged(auth, u => { user = u; });
+
+        ui.tabs[0].onclick = () => {
+            ui.panels[0].classList.remove('hidden'); ui.panels[1].classList.add('hidden');
+            ui.tabs[0].className = "flex-1 py-2.5 text-sm font-bold bg-slate-800 rounded-xl text-blue-400 shadow-sm";
+            ui.tabs[1].className = "flex-1 py-2.5 text-sm font-bold text-slate-500";
+        };
+        ui.tabs[1].onclick = () => {
+            ui.panels[1].classList.remove('hidden'); ui.panels[0].classList.add('hidden');
+            ui.tabs[1].className = "flex-1 py-2.5 text-sm font-bold bg-slate-800 rounded-xl text-blue-400 shadow-sm";
+            ui.tabs[0].className = "flex-1 py-2.5 text-sm font-bold text-slate-500";
+        };
+
+        el('btn-create-room').onclick = async () => {
+            const rid = Math.random().toString(36).substring(2, 7).toUpperCase();
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', rid), {
+                leader: user.uid,
+                p1: { spm: 60, cnt: 10 }, p2: { spm: 90, cnt: 20 }, p3: { spm: 80 }
+            });
+            initRoom(rid, true);
+        };
+
+        el('btn-join-room').onclick = () => {
+            const rid = el('room-input').value.toUpperCase();
+            if(rid) initRoom(rid, false);
+        };
+
+        function initRoom(rid, leader) {
+            currentRoomId = rid;
+            isLeader = leader;
+            el('display-room-id').textContent = rid;
+            el('room-active-ui').classList.remove('hidden');
+            el('connection-status').textContent = "Cloud Sync Active";
+            el('connection-status').classList.replace('text-slate-500', 'text-blue-500');
+
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', rid), snap => {
+                if(!snap.exists()) return;
+                const d = snap.data();
+                if(!isLeader) {
+                    el('p1-spm').value = d.p1.spm; el('p1-cnt').value = d.p1.cnt;
+                    el('p2-spm').value = d.p2.spm; el('p2-cnt').value = d.p2.cnt;
+                    el('p3-spm').value = d.p3.spm;
+                    document.querySelectorAll('.cfg').forEach(i => i.disabled = true);
+                }
+            });
+        }
+
+        document.querySelectorAll('.cfg').forEach(i => {
+            i.onchange = async () => {
+                if(!isLeader || !currentRoomId) return;
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId), {
+                    p1: { spm: parseInt(el('p1-spm').value), cnt: parseInt(el('p1-cnt').value) },
+                    p2: { spm: parseInt(el('p2-spm').value), cnt: parseInt(el('p2-cnt').value) },
+                    p3: { spm: parseInt(el('p3-spm').value) }
+                });
+            }
+        });
+
+        el('btn-leave').onclick = () => location.reload();
+
+        // --- Audio Engine ---
+        function playBeat(time, high) {
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(high ? 1000 : 500, time);
+            g.gain.setValueAtTime(0.2, time);
+            g.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.start(time); osc.stop(time + 0.1);
+
+            const d = (time - audioCtx.currentTime) * 1000;
+            setTimeout(() => {
+                const b = el('beat-indicator');
+                b.classList.add('animate-beat', 'opacity-80', 'bg-blue-400');
+                setTimeout(() => b.classList.remove('animate-beat', 'opacity-80', 'bg-blue-400'), 80);
+            }, d);
+        }
+
+        function scheduler() {
+            while (nextTime < audioCtx.currentTime + 0.1) {
+                const p = activeProg[phaseIdx];
+                playBeat(nextTime, strokeIdx === 0);
+                
+                const d = (nextTime - audioCtx.currentTime) * 1000;
+                setTimeout(() => {
+                    strokeIdx++;
+                    el('val-cnt').textContent = strokeIdx;
+                    el('val-spm').textContent = p.spm;
+                    el('phase-tag').textContent = p.name;
+                    el('val-goal').textContent = p.cnt === Infinity ? '∞' : p.cnt;
+                    el('prog-bar').style.width = p.cnt === Infinity ? '100%' : `${(strokeIdx/p.cnt)*100}%`;
+
+                    if (strokeIdx >= p.cnt && phaseIdx < activeProg.length - 1) {
+                        phaseIdx++; strokeIdx = 0;
+                    }
+                }, d);
+
+                nextTime += (60.0 / p.spm);
+            }
+            timerID = setTimeout(scheduler, 25);
+        }
+
+        ui.start.onclick = () => {
+            if(!audioCtx) audioCtx = new AudioContext();
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            
+            requestWakeLock();
+            activeProg = [
+                { name: 'START', spm: parseInt(el('p1-spm').value), cnt: parseInt(el('p1-cnt').value) },
+                { name: 'SPURT', spm: parseInt(el('p2-spm').value), cnt: parseInt(el('p2-cnt').value) },
+                { name: 'CRUISE', spm: parseInt(el('p3-spm').value), cnt: Infinity }
+            ];
+            phaseIdx = 0; strokeIdx = 0; nextTime = audioCtx.currentTime + 0.1;
+            
+            ui.settings.classList.add('hidden'); ui.display.classList.remove('hidden');
+            ui.start.classList.add('hidden'); ui.stop.classList.remove('hidden');
+            scheduler();
+        };
+
+        ui.stop.onclick = () => {
+            clearTimeout(timerID);
+            releaseWakeLock();
+            ui.settings.classList.remove('hidden'); ui.display.classList.add('hidden');
+            ui.start.classList.remove('hidden'); ui.stop.classList.add('hidden');
+        };
+    </script>
+</body>
+</html>
