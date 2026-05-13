@@ -3,70 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DragonBoat Pro</title>
+    <title>DragonBoat Pro Final</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
         .animate-beat { animation: pulse 0.1s ease-out; }
+        input:disabled { opacity: 0.4; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-4">
 
     <div class="max-w-md w-full space-y-4 pt-4">
-        <header class="text-center mb-6">
+        <header class="text-center mb-4">
             <h1 class="text-3xl font-black text-blue-500 italic">DRAGON PRO</h1>
-            <p class="text-slate-500 text-[10px] font-bold tracking-widest text-emerald-500">CONTINUOUS AUDIO ENGINE ENABLED</p>
+            <p class="text-[9px] font-bold text-emerald-500 tracking-widest uppercase">Universal Audio Engine v3.0</p>
         </header>
 
-        <!-- 시간 설정 -->
-        <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800">
-            <h3 class="text-[10px] font-black text-slate-500 uppercase mb-3">Training Timer</h3>
+        <!-- 1. 총 훈련 시간 설정 -->
+        <div class="bg-slate-900 rounded-3xl p-5 border border-slate-800 shadow-xl">
+            <h3 class="text-[10px] font-black text-blue-400 uppercase mb-3 flex items-center gap-2">
+                <span class="w-1.5 h-1.5 bg-blue-400 rounded-full"></span> Total Training Time
+            </h3>
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
-                    <label class="text-[9px] text-slate-600 font-bold ml-1 text-blue-400">MINUTES</label>
-                    <input type="number" id="t-min" value="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500 text-xl">
+                    <label class="text-[9px] text-slate-600 font-bold ml-1">MINUTES</label>
+                    <input type="number" id="t-min" value="2" class="config-input w-full bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500 text-xl">
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[9px] text-slate-600 font-bold ml-1 text-blue-400">SECONDS</label>
-                    <input type="number" id="t-sec" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500 text-xl">
+                    <label class="text-[9px] text-slate-600 font-bold ml-1">SECONDS</label>
+                    <input type="number" id="t-sec" value="0" class="config-input w-full bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500 text-xl">
                 </div>
             </div>
         </div>
 
-        <!-- 피치 설정 -->
-        <div id="settings" class="bg-slate-900 rounded-3xl p-5 border border-slate-800 space-y-4">
-            <div class="grid grid-cols-2 gap-3">
-                <div class="col-span-2 text-[10px] font-bold text-slate-600">PHASE 1 (10회)</div>
-                <input type="number" id="p1-spm" value="60" class="bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none">
-                <div class="flex items-center justify-center text-xs text-slate-700 font-bold">SPM</div>
+        <!-- 2. 페이즈별 설정 (3단계) -->
+        <div id="phase-settings" class="bg-slate-900 rounded-3xl p-5 border border-slate-800 space-y-5 shadow-xl">
+            <h3 class="text-[10px] font-black text-blue-400 uppercase flex items-center gap-2">
+                <span class="w-1.5 h-1.5 bg-blue-400 rounded-full"></span> 3-Phase Program
+            </h3>
+            
+            <!-- Phase 1 -->
+            <div class="grid grid-cols-2 gap-3 pb-3 border-b border-slate-800/50">
+                <div class="col-span-2 text-[9px] font-bold text-slate-500">PHASE 1 (Start)</div>
+                <div class="relative"><input type="number" id="p1-spm" value="60" class="config-input w-full bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none"><span class="absolute right-3 top-4 text-[8px] text-slate-700">SPM</span></div>
+                <div class="relative"><input type="number" id="p1-cnt" value="10" class="config-input w-full bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none"><span class="absolute right-3 top-4 text-[8px] text-slate-700">STROKES</span></div>
             </div>
+
+            <!-- Phase 2 -->
+            <div class="grid grid-cols-2 gap-3 pb-3 border-b border-slate-800/50">
+                <div class="col-span-2 text-[9px] font-bold text-slate-500">PHASE 2 (Spurt)</div>
+                <div class="relative"><input type="number" id="p2-spm" value="90" class="config-input w-full bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none"><span class="absolute right-3 top-4 text-[8px] text-slate-700">SPM</span></div>
+                <div class="relative"><input type="number" id="p2-cnt" value="20" class="config-input w-full bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none"><span class="absolute right-3 top-4 text-[8px] text-slate-700">STROKES</span></div>
+            </div>
+
+            <!-- Phase 3 -->
             <div class="grid grid-cols-2 gap-3">
-                <div class="col-span-2 text-[10px] font-bold text-slate-600">PHASE 2 (20회)</div>
-                <input type="number" id="p2-spm" value="90" class="bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none">
-                <div class="flex items-center justify-center text-xs text-slate-700 font-bold">SPM</div>
+                <div class="col-span-2 text-[9px] font-bold text-slate-500">PHASE 3 (Cruise)</div>
+                <div class="relative"><input type="number" id="p3-spm" value="80" class="config-input w-full bg-slate-950 border border-slate-800 rounded-xl py-3 text-center font-bold outline-none"><span class="absolute right-3 top-4 text-[8px] text-slate-700">SPM</span></div>
+                <div class="relative flex items-center justify-center text-[10px] font-bold text-slate-700 uppercase">Until Timer Ends</div>
             </div>
         </div>
 
-        <!-- 디스플레이 -->
-        <div id="display" class="hidden bg-slate-900 rounded-[2.5rem] p-8 border border-blue-500/30 text-center relative overflow-hidden">
-            <div id="time-left" class="text-blue-400 font-mono font-bold mb-4 text-2xl">00:00</div>
+        <!-- 3. 실시간 대시보드 -->
+        <div id="display" class="hidden bg-slate-900 rounded-[2.5rem] p-8 border border-blue-500/30 text-center relative overflow-hidden shadow-2xl">
+            <div id="time-left" class="text-blue-400 font-mono font-bold mb-4 text-3xl tracking-tighter">00:00</div>
             <div id="phase-tag" class="text-[10px] font-black text-slate-500 mb-2 tracking-widest uppercase">READY</div>
             <div id="val-spm" class="text-8xl font-black leading-none text-white mb-6 tracking-tighter">0</div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-slate-950 rounded-2xl py-4 border border-slate-800">
-                    <div class="text-[9px] text-slate-600 font-bold mb-1 uppercase">Stroke</div>
+                    <div class="text-[9px] text-slate-600 font-bold mb-1 uppercase">Strokes</div>
                     <div id="val-cnt" class="text-3xl font-mono font-bold text-yellow-500">0</div>
                 </div>
-                <div id="beat-box" class="flex items-center justify-center bg-slate-950 rounded-2xl border border-slate-800">
-                    <div id="beat-dot" class="w-10 h-10 bg-blue-500 rounded-full opacity-10 blur-sm"></div>
+                <div id="beat-box" class="flex items-center justify-center bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
+                    <div id="beat-dot" class="w-12 h-12 bg-blue-500 rounded-full opacity-10 blur-md transition-all"></div>
                 </div>
             </div>
         </div>
 
-        <!-- 컨트롤 -->
-        <button id="btn-start" class="w-full bg-white text-slate-950 py-5 rounded-2xl text-xl font-black shadow-2xl active:scale-95 transition-all">START TRAINING</button>
-        <button id="btn-stop" class="hidden w-full bg-rose-600 text-white py-5 rounded-2xl text-xl font-black active:scale-95 transition-all uppercase">Stop</button>
+        <!-- 컨트롤 버튼 -->
+        <div class="space-y-3 pb-10">
+            <button id="btn-start" class="w-full bg-white text-slate-950 py-5 rounded-2xl text-xl font-black shadow-2xl active:scale-95 transition-all">START TRAINING</button>
+            <button id="btn-stop" class="hidden w-full bg-rose-600 text-white py-5 rounded-2xl text-xl font-black active:scale-95 transition-all">STOP</button>
+        </div>
     </div>
 
     <script>
@@ -80,79 +99,72 @@
         let prog = [];
         let isRunning = false;
 
+        // 아이폰 오디오 강제 활성화
         function initAudio() {
             if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-                    latencyHint: 'interactive'
-                });
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
+            // 무음 버퍼 재생으로 엔진 깨우기
+            const buffer = audioCtx.createBuffer(1, 1, 22050);
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start(0);
         }
 
-        // 박자 소리를 생성하는 핵심 함수 (아이폰 호환성 강화)
+        // 박자 소리 생성 (아이폰에서 잘 들리는 파형)
         function playBeat(time, isFirst) {
             if (!isRunning) return;
-
             const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-
-            // 아이폰에서 잘 들리는 강한 사각형 파형 사용
-            osc.type = 'square'; 
-            osc.frequency.setValueAtTime(isFirst ? 880 : 440, time);
-
-            gainNode.gain.setValueAtTime(0, time);
-            gainNode.gain.linearRampToValueAtTime(0.1, time + 0.005);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
-
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
+            const g = audioCtx.createGain();
+            osc.type = 'square'; // 뚫고 나오는 소리
+            osc.frequency.setValueAtTime(isFirst ? 900 : 450, time);
+            g.gain.setValueAtTime(0.2, time);
+            g.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+            osc.connect(g);
+            g.connect(audioCtx.destination);
             osc.start(time);
             osc.stop(time + 0.1);
 
-            // 시각적 피드백
             const delay = (time - audioCtx.currentTime) * 1000;
             setTimeout(() => {
                 const dot = document.getElementById('beat-dot');
                 dot.classList.add('animate-beat', 'opacity-100', 'bg-blue-400');
-                setTimeout(() => {
-                    dot.classList.remove('animate-beat', 'opacity-100', 'bg-blue-400');
-                }, 80);
+                setTimeout(() => dot.classList.remove('animate-beat', 'opacity-100', 'bg-blue-400'), 80);
             }, Math.max(0, delay));
         }
 
         function scheduler() {
-            // 아이폰의 멈춤 방지를 위해 앞선 비트를 미리 큐에 쌓음
-            while (nextTime < audioCtx.currentTime + 0.2) {
+            while (nextTime < audioCtx.currentTime + 0.15) {
                 const p = prog[phaseIdx];
                 playBeat(nextTime, strokeIdx === 0);
                 
-                // UI 업데이트 예약
-                const currentNextTime = nextTime;
-                const currentStroke = strokeIdx;
-                const currentPhase = p;
-                
-                const delay = (currentNextTime - audioCtx.currentTime) * 1000;
+                const schedNextTime = nextTime;
+                const schedStroke = strokeIdx;
+                const schedPhase = p;
+
+                const delay = (schedNextTime - audioCtx.currentTime) * 1000;
                 setTimeout(() => {
                     if (!isRunning) return;
                     strokeIdx++;
                     document.getElementById('val-cnt').textContent = strokeIdx;
-                    document.getElementById('val-spm').textContent = currentPhase.spm;
-                    document.getElementById('phase-tag').textContent = currentPhase.name;
+                    document.getElementById('val-spm').textContent = schedPhase.spm;
+                    document.getElementById('phase-tag').textContent = schedPhase.name;
                     
-                    if (strokeIdx >= currentPhase.cnt && phaseIdx < prog.length - 1) {
-                        phaseIdx++; 
-                        strokeIdx = 0;
+                    if (strokeIdx >= schedPhase.cnt && phaseIdx < prog.length - 1) {
+                        phaseIdx++; strokeIdx = 0;
                     }
                 }, Math.max(0, delay));
 
                 nextTime += (60.0 / p.spm);
             }
-            timerID = setTimeout(scheduler, 50);
+            timerID = setTimeout(scheduler, 40);
         }
 
+        // 음성 안내 함수
         function speak(text, callback) {
             const msg = new SpeechSynthesisUtterance(text);
             msg.lang = 'en-US';
@@ -169,25 +181,27 @@
             const s = parseInt(document.getElementById('t-sec').value) || 0;
             timeLeft = (m * 60) + s;
 
+            // 페이즈 프로그램 구성
             prog = [
-                { name: 'START', spm: parseInt(document.getElementById('p1-spm').value), cnt: 10 },
-                { name: 'SPURT', spm: parseInt(document.getElementById('p2-spm').value), cnt: 20 },
-                { name: 'CRUISE', spm: 80, cnt: Infinity }
+                { name: 'PHASE 1: START', spm: parseInt(document.getElementById('p1-spm').value), cnt: parseInt(document.getElementById('p1-cnt').value) },
+                { name: 'PHASE 2: SPURT', spm: parseInt(document.getElementById('p2-spm').value), cnt: parseInt(document.getElementById('p2-cnt').value) },
+                { name: 'PHASE 3: CRUISE', spm: parseInt(document.getElementById('p3-spm').value), cnt: Infinity }
             ];
 
-            document.getElementById('settings').classList.add('hidden');
+            // UI 전환
+            document.querySelectorAll('.bg-slate-900').forEach(el => el.id !== 'display' && el.classList.add('hidden'));
             document.getElementById('display').classList.remove('hidden');
             document.getElementById('btn-start').classList.add('hidden');
             document.getElementById('btn-stop').classList.remove('hidden');
 
+            // 멘트 후 시작
             speak("Are you ready?", () => {
                 setTimeout(() => {
                     speak("Attention!", () => {
                         setTimeout(() => {
                             speak("Go!", () => {
                                 nextTime = audioCtx.currentTime + 0.05;
-                                phaseIdx = 0; 
-                                strokeIdx = 0;
+                                phaseIdx = 0; strokeIdx = 0;
                                 scheduler();
                                 startCountdown();
                             });
@@ -198,31 +212,39 @@
         };
 
         function startCountdown() {
-            if (countdownID) clearInterval(countdownID);
             countdownID = setInterval(() => {
                 if (!isRunning) return;
                 timeLeft--;
                 const min = Math.floor(timeLeft / 60).toString().padStart(2, '0');
                 const sec = (timeLeft % 60).toString().padStart(2, '0');
                 document.getElementById('time-left').textContent = `${min}:${sec}`;
-                if (timeLeft <= 0) stopTraining();
+                if (timeLeft <= 0) stopTraining(true);
             }, 1000);
         }
 
-        function stopTraining() {
+        function stopTraining(auto = false) {
             isRunning = false;
             clearTimeout(timerID);
             clearInterval(countdownID);
             if (audioCtx) audioCtx.suspend();
-            
-            document.getElementById('settings').classList.remove('hidden');
+
+            // 종료 신호 (자동 종료 시)
+            if (auto) {
+                const endOsc = new (window.AudioContext || window.webkitAudioContext)();
+                const g = endOsc.createGain();
+                const o = endOsc.createOscillator();
+                o.connect(g); g.connect(endOsc.destination);
+                o.frequency.value = 800;
+                o.start(); o.stop(endOsc.currentTime + 0.5);
+            }
+
+            document.querySelectorAll('.bg-slate-900').forEach(el => el.id !== 'display' && el.classList.remove('hidden'));
             document.getElementById('display').classList.add('hidden');
             document.getElementById('btn-start').classList.remove('hidden');
             document.getElementById('btn-stop').classList.add('hidden');
-            document.getElementById('time-left').textContent = "00:00";
         }
 
-        document.getElementById('btn-stop').onclick = stopTraining;
+        document.getElementById('btn-stop').onclick = () => stopTraining(false);
     </script>
 </body>
 </html>
