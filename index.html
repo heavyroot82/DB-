@@ -4,272 +4,299 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DragonBoat Pro</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
+        @keyframes pulse-bit {
+            0% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.2; }
         }
-        .animate-beat { animation: pulse 0.1s ease-out; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        input:disabled { opacity: 0.5; cursor: not-allowed; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); }
+        .animate-beat { animation: pulse-bit 0.1s ease-out; }
+        .glass-panel { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .transition-display { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center font-sans overflow-x-hidden selection:bg-blue-500/30">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center font-sans overflow-x-hidden">
 
-    <div class="max-w-md w-full px-4 pt-6 pb-20 space-y-4">
-        <!-- 상단 헤더 -->
-        <header class="flex justify-between items-center px-2">
+    <div class="max-w-md w-full px-6 py-8 pb-32 space-y-6">
+        <!-- 앱 헤더 -->
+        <header class="flex justify-between items-center mb-2">
             <div>
-                <h1 class="text-2xl font-black text-blue-500 tracking-tighter">DRAGON<span class="text-white">PRO</span></h1>
-                <p id="connection-status" class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">OFFLINE MODE</p>
+                <h1 class="text-2xl font-black text-blue-500 tracking-tighter italic">DRAGON<span class="text-white">PRO</span></h1>
+                <p class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Advanced Metronome</p>
             </div>
-            <div id="wake-lock-indicator" class="flex items-center gap-1.5 px-3 py-1 bg-slate-900 rounded-full border border-slate-800">
-                <div class="w-1.5 h-1.5 bg-slate-500 rounded-full" id="lock-dot"></div>
-                <span class="text-[10px] font-bold text-slate-400" id="lock-text">SCREEN ON</span>
+            <div class="flex items-center gap-2 px-3 py-1.5 bg-slate-900 rounded-full border border-slate-800 shadow-inner">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                <span class="text-[10px] font-black text-slate-400 uppercase">System Ready</span>
             </div>
         </header>
 
-        <div class="glass-panel rounded-3xl p-5 border border-slate-800 shadow-2xl">
-            <div class="flex gap-1 bg-slate-900 p-1 rounded-2xl mb-4">
-                <button id="tab-create" class="flex-1 py-2.5 text-sm font-bold bg-slate-800 rounded-xl text-blue-400 shadow-sm transition-all">Setup</button>
-                <button id="tab-join" class="flex-1 py-2.5 text-sm font-bold text-slate-500 transition-all">Cloud</button>
-            </div>
-
-            <div id="panel-create" class="space-y-3 text-center">
-                <p class="text-[11px] text-slate-500">훈련을 시작하려면 아래 START 버튼을 누르세요.</p>
-            </div>
-
-            <div id="panel-join" class="hidden flex flex-col gap-3">
-                <div class="flex gap-2">
-                    <input type="text" id="room-input" placeholder="ROOM ID" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center font-mono font-bold focus:border-blue-500 outline-none">
-                    <button id="btn-join-room" class="bg-slate-700 hover:bg-slate-600 px-6 rounded-xl font-bold transition-all active:scale-[0.98]">입장</button>
+        <!-- 훈련 설정 섹션 -->
+        <section id="settings-area" class="transition-display space-y-4">
+            <div class="bg-slate-900/50 rounded-3xl p-6 border border-slate-800 space-y-6">
+                <div>
+                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        ⏱️ Target Training Time
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] text-slate-600 font-bold text-center block uppercase">Minutes</label>
+                            <input type="number" id="target-min" value="2" class="w-full bg-slate-950 border border-slate-700 rounded-2xl py-4 text-center text-2xl font-black outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] text-slate-600 font-bold text-center block uppercase">Seconds</label>
+                            <input type="number" id="target-sec" value="0" class="w-full bg-slate-950 border border-slate-700 rounded-2xl py-4 text-center text-2xl font-black outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                    </div>
                 </div>
-                <p class="text-[10px] text-center text-slate-600 leading-tight">클라우드 동기화는 Firebase 설정이 필요합니다.<br>현재는 개인 훈련 모드로 작동합니다.</p>
-            </div>
 
-            <div id="room-active-ui" class="hidden mt-4 pt-4 border-t border-slate-800/50 flex justify-between items-center">
-                <div class="flex flex-col">
-                    <span class="text-[9px] text-slate-500 font-black uppercase">Connected</span>
-                    <span id="display-room-id" class="font-mono text-blue-400 font-black text-lg leading-none">------</span>
+                <div class="space-y-4 border-t border-slate-800 pt-6">
+                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                        🚣 Pitch Program Settings
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2 text-[11px] font-black text-blue-500 flex justify-between">
+                            <span>STAGE 1: START (10-15 Strokes)</span>
+                            <span class="text-slate-600">SPM / COUNT</span>
+                        </div>
+                        <input type="number" id="p1-spm" value="60" class="bg-slate-950 border border-slate-700 rounded-xl py-3 text-center font-black outline-none focus:border-blue-500">
+                        <input type="number" id="p1-cnt" value="10" class="bg-slate-950 border border-slate-700 rounded-xl py-3 text-center font-black outline-none focus:border-blue-500">
+                        
+                        <div class="col-span-2 text-[11px] font-black text-blue-500 flex justify-between mt-2">
+                            <span>STAGE 2: SPURT (Power)</span>
+                            <span class="text-slate-600">SPM / COUNT</span>
+                        </div>
+                        <input type="number" id="p2-spm" value="90" class="bg-slate-950 border border-slate-700 rounded-xl py-3 text-center font-black outline-none focus:border-blue-500">
+                        <input type="number" id="p2-cnt" value="20" class="bg-slate-950 border border-slate-700 rounded-xl py-3 text-center font-black outline-none focus:border-blue-500">
+                        
+                        <div class="col-span-2 text-[11px] font-black text-blue-500 mt-2">STAGE 3: CRUISE (Steady)</div>
+                        <input type="number" id="p3-spm" value="80" class="col-span-2 bg-slate-950 border border-slate-700 rounded-xl py-3 text-center font-black outline-none focus:border-blue-500">
+                    </div>
                 </div>
-                <button id="btn-leave" class="px-4 py-2 bg-rose-500/10 text-rose-500 rounded-lg text-xs font-black hover:bg-rose-500/20 transition-all">RESET</button>
             </div>
-        </div>
-
-        <div id="settings-area" class="glass-panel rounded-3xl p-5 border border-slate-800 space-y-5">
-            <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
-                Training Program
-            </h3>
             
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="col-span-2 text-[10px] font-bold text-blue-500/70">STAGE 1: START</div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] text-slate-600 font-bold ml-1">SPM</label>
-                        <input type="number" id="p1-spm" value="60" class="cfg w-full bg-slate-900 border border-slate-700 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500">
+            <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4">
+                <p class="text-[11px] text-blue-400 leading-relaxed text-center font-medium">
+                    설정한 시간이 종료되면 자동으로 멈춥니다.<br>출발 멘트 후 자동으로 훈련이 시작됩니다.
+                </p>
+            </div>
+        </section>
+
+        <!-- 실행 대시보드 (초기엔 숨김) -->
+        <section id="main-display" class="hidden transition-display space-y-6">
+            <div class="glass-panel rounded-[3rem] p-10 border border-blue-500/30 text-center relative overflow-hidden shadow-2xl shadow-blue-900/20">
+                <!-- 상단 프로그레스 바 -->
+                <div id="prog-bar" class="absolute top-0 left-0 h-2 bg-gradient-to-right from-blue-600 to-blue-400 transition-all duration-300" style="width: 0%"></div>
+                
+                <div class="flex justify-between items-center mb-8">
+                    <div id="phase-tag" class="px-4 py-1.5 bg-blue-500 text-white text-[11px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/30">WAITING</div>
+                    <div id="time-left" class="font-mono text-2xl font-black text-slate-300">00:00</div>
+                </div>
+                
+                <div class="flex flex-col items-center mb-10">
+                    <div id="val-spm" class="text-[10rem] font-black leading-none tracking-tighter text-white drop-shadow-2xl">0</div>
+                    <div class="text-[12px] font-black text-slate-500 tracking-[0.6em] mt-2 uppercase">Strokes Per Min</div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-10">
+                    <div class="bg-slate-950/80 rounded-3xl py-6 border border-slate-800">
+                        <div class="text-[10px] text-slate-500 font-black mb-1 uppercase tracking-widest">Current Stroke</div>
+                        <div id="val-cnt" class="text-5xl font-black text-amber-500">0</div>
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] text-slate-600 font-bold ml-1">STROKES</label>
-                        <input type="number" id="p1-cnt" value="10" class="cfg w-full bg-slate-900 border border-slate-700 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500">
+                    <div class="bg-slate-950/80 rounded-3xl py-6 border border-slate-800">
+                        <div class="text-[10px] text-slate-500 font-black mb-1 uppercase tracking-widest">Phase Goal</div>
+                        <div id="val-goal" class="text-5xl font-black text-slate-400">0</div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="col-span-2 text-[10px] font-bold text-blue-500/70">STAGE 2: SPURT</div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] text-slate-600 font-bold ml-1">SPM</label>
-                        <input type="number" id="p2-spm" value="90" class="cfg w-full bg-slate-900 border border-slate-700 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] text-slate-600 font-bold ml-1">STROKES</label>
-                        <input type="number" id="p2-cnt" value="20" class="cfg w-full bg-slate-900 border border-slate-700 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500">
-                    </div>
-                </div>
-                <div class="space-y-1">
-                    <div class="text-[10px] font-bold text-blue-500/70">STAGE 3: CRUISE</div>
-                    <label class="text-[9px] text-slate-600 font-bold ml-1">SPM (UNTIL STOP)</label>
-                    <input type="number" id="p3-spm" value="80" class="cfg w-full bg-slate-900 border border-slate-700 rounded-xl py-3 text-center font-bold outline-none focus:border-blue-500">
+
+                <!-- 시각적 비트 표시기 -->
+                <div id="beat-indicator" class="w-20 h-20 bg-blue-500 rounded-full mx-auto opacity-10 blur-xl"></div>
+
+                <!-- 음성 오버레이 -->
+                <div id="voice-overlay" class="hidden absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center z-50 transition-opacity">
+                    <div id="voice-text" class="text-6xl font-black text-blue-500 uppercase tracking-tighter animate-bounce">Ready</div>
+                    <p class="text-slate-500 text-xs mt-4 font-bold tracking-widest">PREPARING START...</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div id="main-display" class="hidden glass-panel rounded-[2.5rem] p-8 border border-blue-500/30 text-center relative overflow-hidden">
-            <div id="prog-bar" class="absolute top-0 left-0 h-1.5 bg-blue-500 transition-all duration-300" style="width: 0%"></div>
-            <div id="phase-tag" class="inline-block px-4 py-1.5 bg-blue-500/10 text-blue-400 text-[10px] font-black rounded-full mb-6 border border-blue-500/20">WAITING</div>
-            
-            <div class="flex flex-col items-center mb-8">
-                <div id="val-spm" class="text-9xl font-black leading-none tracking-tighter text-white">0</div>
-                <div class="text-xs font-black text-slate-500 tracking-[0.5em] mt-4 uppercase">Strokes Per Min</div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="bg-slate-950/50 rounded-2xl py-5 border border-slate-800">
-                    <div class="text-[10px] text-slate-600 font-black mb-1 uppercase tracking-widest">Stroke</div>
-                    <div id="val-cnt" class="text-4xl font-mono font-bold text-yellow-500">0</div>
-                </div>
-                <div class="bg-slate-950/50 rounded-2xl py-5 border border-slate-800">
-                    <div class="text-[10px] text-slate-600 font-black mb-1 uppercase tracking-widest">Goal</div>
-                    <div id="val-goal" class="text-4xl font-mono font-bold text-slate-400">0</div>
-                </div>
-            </div>
-
-            <div id="beat-indicator" class="w-14 h-14 bg-white rounded-full mx-auto opacity-5 blur-md transition-all duration-75"></div>
-        </div>
-
-        <!-- 하단 컨트롤 -->
-        <div class="fixed bottom-6 left-0 right-0 px-6 max-w-md mx-auto flex gap-3">
-            <button id="btn-start" class="flex-1 bg-white text-slate-950 py-5 rounded-2xl text-xl font-black shadow-2xl active:scale-95 transition-all">START</button>
-            <button id="btn-stop" class="hidden flex-1 bg-rose-600 text-white py-5 rounded-2xl text-xl font-black active:scale-95 transition-all">STOP</button>
+        <!-- 제어 버튼 (하단 고정) -->
+        <div class="fixed bottom-10 left-0 right-0 px-8 max-w-md mx-auto flex gap-4">
+            <button id="btn-start" class="flex-1 bg-gradient-to-b from-blue-500 to-blue-700 text-white py-6 rounded-[2rem] text-2xl font-black shadow-xl shadow-blue-900/40 active:scale-95 transition-transform">
+                START TRAINING
+            </button>
+            <button id="btn-stop" class="hidden flex-1 bg-gradient-to-b from-rose-600 to-rose-800 text-white py-6 rounded-[2rem] text-2xl font-black shadow-xl shadow-rose-900/40 active:scale-95 transition-transform">
+                STOP
+            </button>
         </div>
     </div>
 
     <script>
-        // UI Selectors
         const el = id => document.getElementById(id);
         const ui = {
-            tabs: [el('tab-create'), el('tab-join')],
-            panels: [el('panel-create'), el('panel-join')],
-            start: el('btn-start'),
-            stop: el('btn-stop'),
-            display: el('main-display'),
-            settings: el('settings-area')
+            start: el('btn-start'), stop: el('btn-stop'),
+            display: el('main-display'), settings: el('settings-area'),
+            spm: el('val-spm'), cnt: el('val-cnt'), goal: el('val-goal'),
+            phase: el('phase-tag'), bar: el('prog-bar'), time: el('time-left'),
+            beat: el('beat-indicator'),
+            vOverlay: el('voice-overlay'), vText: el('voice-text'),
+            tMin: el('target-min'), tSec: el('target-sec')
         };
 
-        // Audio Engine Vars
         let audioCtx = null;
         let timerID = null;
+        let countdownID = null;
         let nextTime = 0;
         let phaseIdx = 0;
         let strokeIdx = 0;
         let activeProg = [];
-        let wakeLock = null;
+        let totalRemainingSeconds = 0;
 
-        // --- Wake Lock (화면 꺼짐 방지) ---
-        async function requestWakeLock() {
-            if ('wakeLock' in navigator) {
-                try {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    el('lock-dot').classList.replace('bg-slate-500', 'bg-emerald-500');
-                    el('lock-text').classList.replace('text-slate-400', 'text-emerald-400');
-                } catch (err) { console.error(err); }
-            }
-        }
-
-        function releaseWakeLock() {
-            if (wakeLock) {
-                wakeLock.release();
-                wakeLock = null;
-                el('lock-dot').classList.replace('bg-emerald-500', 'bg-slate-500');
-                el('lock-text').classList.replace('text-emerald-400', 'text-slate-400');
-            }
-        }
-
-        // --- UI Tabs ---
-        ui.tabs[0].onclick = () => {
-            ui.panels[0].classList.remove('hidden'); ui.panels[1].classList.add('hidden');
-            ui.tabs[0].className = "flex-1 py-2.5 text-sm font-bold bg-slate-800 rounded-xl text-blue-400 shadow-sm";
-            ui.tabs[1].className = "flex-1 py-2.5 text-sm font-bold text-slate-500";
-        };
-        ui.tabs[1].onclick = () => {
-            ui.panels[1].classList.remove('hidden'); ui.panels[0].classList.add('hidden');
-            ui.tabs[1].className = "flex-1 py-2.5 text-sm font-bold bg-slate-800 rounded-xl text-blue-400 shadow-sm";
-            ui.tabs[0].className = "flex-1 py-2.5 text-sm font-bold text-slate-500";
-        };
-
-        el('btn-leave').onclick = () => location.reload();
-
-        function playBeat(time, high) {
+        // 사운드 엔진: 정밀한 메트로놈 소리
+        function playSound(time, freq, type = 'sine', volume = 0.4) {
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const g = audioCtx.createGain();
-            
-            // 날카로운 소리를 위해 sine 대신 triangle 또는 square 사용
-            osc.type = 'triangle'; 
-            osc.frequency.setValueAtTime(high ? 1000 : 600, time);
-            
-            g.gain.setValueAtTime(0.5, time);
-            g.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
-            
-            osc.connect(g);
-            g.connect(audioCtx.destination);
-            
-            osc.start(time);
-            osc.stop(time + 0.1);
-
-            // 시각적 피드백
-            const d = (time - audioCtx.currentTime) * 1000;
-            setTimeout(() => {
-                const b = el('beat-indicator');
-                b.classList.add('animate-beat', 'opacity-100', 'bg-blue-400');
-                setTimeout(() => b.classList.remove('animate-beat', 'opacity-100', 'bg-blue-400'), 80);
-            }, d);
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, time);
+            g.gain.setValueAtTime(volume, time);
+            g.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.start(time); osc.stop(time + 0.15);
         }
 
+        // 종료 알림음
+        function playEndSound() {
+            const now = audioCtx.currentTime;
+            playSound(now, 523.25, 'triangle', 0.5); // C5
+            playSound(now + 0.15, 659.25, 'triangle', 0.5); // E5
+            playSound(now + 0.3, 783.99, 'triangle', 0.5); // G5
+        }
+
+        // 음성 안내 기능 (Ready, Attention, Go)
+        function speak(text, rate = 1.0, pitch = 1.0) {
+            return new Promise((resolve) => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = rate;
+                utterance.pitch = pitch;
+                utterance.onend = resolve;
+                window.speechSynthesis.speak(utterance);
+                ui.vText.textContent = text;
+            });
+        }
+
+        function updateCountdownUI() {
+            const m = Math.floor(totalRemainingSeconds / 60);
+            const s = totalRemainingSeconds % 60;
+            ui.time.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        // 정밀 메트로놈 스케줄러
         function scheduler() {
             while (nextTime < audioCtx.currentTime + 0.1) {
                 const p = activeProg[phaseIdx];
-                playBeat(nextTime, strokeIdx === 0);
+                const isFirst = strokeIdx === 0;
                 
-                const d = (nextTime - audioCtx.currentTime) * 1000;
+                // 첫 박자는 더 높은 주파수로 강조
+                playSound(nextTime, isFirst ? 1200 : 800, 'square', 0.2);
+                
+                const delay = (nextTime - audioCtx.currentTime) * 1000;
                 setTimeout(() => {
                     strokeIdx++;
-                    el('val-cnt').textContent = strokeIdx;
-                    el('val-spm').textContent = p.spm;
-                    el('phase-tag').textContent = p.name;
-                    el('val-goal').textContent = p.cnt === Infinity ? '∞' : p.cnt;
-                    el('prog-bar').style.width = p.cnt === Infinity ? '100%' : `${(strokeIdx/p.cnt)*100}%`;
-
-                    if (strokeIdx >= p.cnt && phaseIdx < activeProg.length - 1) {
-                        phaseIdx++; strokeIdx = 0;
+                    ui.cnt.textContent = strokeIdx;
+                    ui.spm.textContent = p.spm;
+                    ui.phase.textContent = p.name;
+                    ui.goal.textContent = p.cnt === Infinity ? '∞' : p.cnt;
+                    
+                    // 진행률 바 업데이트
+                    if (p.cnt !== Infinity) {
+                        ui.bar.style.width = `${(strokeIdx / p.cnt) * 100}%`;
+                    } else {
+                        ui.bar.style.width = '100%';
                     }
-                }, d);
+
+                    // 시각적 비트 피드백
+                    ui.beat.classList.add('animate-beat', 'opacity-100');
+                    setTimeout(() => ui.beat.classList.remove('animate-beat', 'opacity-100'), 80);
+
+                    // 단계 전환 로직
+                    if (strokeIdx >= p.cnt && phaseIdx < activeProg.length - 1) {
+                        phaseIdx++;
+                        strokeIdx = 0;
+                    }
+                }, Math.max(0, delay));
 
                 nextTime += (60.0 / p.spm);
             }
             timerID = setTimeout(scheduler, 25);
         }
 
-        // START 버튼을 누를 때 오디오 엔진을 확실히 깨움
         ui.start.onclick = async () => {
-            // 브라우저 오디오 컨텍스트 생성 및 재개
-            if(!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if(audioCtx.state === 'suspended') {
-                await audioCtx.resume();
-            }
+            // 오디오 초기화 (사용자 제스처 내에서)
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
             
-            // 더미 사운드 재생 (iOS 무음 모드 해제 유도)
-            const osc = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            g.gain.value = 0.0001;
-            osc.connect(g); g.connect(audioCtx.destination);
-            osc.start(0); osc.stop(0.1);
+            // UI 전환
+            ui.settings.classList.add('hidden');
+            ui.display.classList.remove('hidden');
+            ui.vOverlay.classList.remove('hidden');
+            ui.start.classList.add('hidden');
+            ui.stop.classList.remove('hidden');
 
-            requestWakeLock();
+            // 1. 음성 안내 시작
+            await speak("Are you ready?", 0.9, 1.0);
+            await new Promise(r => setTimeout(r, 600));
+            await speak("Attention", 0.8, 0.9);
+            await new Promise(r => setTimeout(r, 1000));
+            
+            ui.vText.classList.replace('text-blue-500', 'text-emerald-500');
+            await speak("Go!", 1.4, 1.2);
+            
+            // 2. 메트로놈 및 타이머 시작
+            ui.vOverlay.classList.add('hidden');
+            ui.vText.classList.replace('text-emerald-500', 'text-blue-500');
+
+            const m = parseInt(ui.tMin.value) || 0;
+            const s = parseInt(ui.tSec.value) || 0;
+            totalRemainingSeconds = (m * 60) + s;
+            updateCountdownUI();
+
             activeProg = [
                 { name: 'START', spm: parseInt(el('p1-spm').value), cnt: parseInt(el('p1-cnt').value) },
                 { name: 'SPURT', spm: parseInt(el('p2-spm').value), cnt: parseInt(el('p2-cnt').value) },
                 { name: 'CRUISE', spm: parseInt(el('p3-spm').value), cnt: Infinity }
             ];
-            phaseIdx = 0; strokeIdx = 0; nextTime = audioCtx.currentTime + 0.1;
-            
-            ui.settings.classList.add('hidden'); ui.display.classList.remove('hidden');
-            ui.start.classList.add('hidden'); ui.stop.classList.remove('hidden');
+
+            phaseIdx = 0; strokeIdx = 0; 
+            nextTime = audioCtx.currentTime + 0.05;
             scheduler();
+
+            // 타이머 작동
+            if (totalRemainingSeconds > 0) {
+                countdownID = setInterval(() => {
+                    totalRemainingSeconds--;
+                    updateCountdownUI();
+                    if (totalRemainingSeconds <= 0) {
+                        playEndSound();
+                        ui.stop.click();
+                    }
+                }, 1000);
+            }
         };
 
         ui.stop.onclick = () => {
             clearTimeout(timerID);
-            releaseWakeLock();
-            ui.settings.classList.remove('hidden'); ui.display.classList.add('hidden');
-            ui.start.classList.remove('hidden'); ui.stop.classList.add('hidden');
+            clearInterval(countdownID);
+            window.speechSynthesis.cancel();
+            
+            ui.settings.classList.remove('hidden');
+            ui.display.classList.add('hidden');
+            ui.start.classList.remove('hidden');
+            ui.stop.classList.add('hidden');
+            ui.vOverlay.classList.add('hidden');
+            ui.bar.style.width = '0%';
         };
     </script>
 </body>
